@@ -11,7 +11,14 @@ app.use(bodyParser.urlencoded({extended : false}));
 app.use(express.static("public"));
 
 mongoose.set({});
-mongoose.connect("mongodb://localhost:27017/wikiDB", {useNewUrlParser: true, useUnifiedTopology: false});
+mongoose.connect("mongodb://127.0.0.1:27017/wikiDB", {useNewUrlParser: true, useUnifiedTopology: true});
+
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+  console.log("Connected to MongoDB successfully");
+});
 
 const articlesSchema = {
     title : String,
@@ -20,24 +27,21 @@ const articlesSchema = {
 
 const Article = mongoose.model("Article", articlesSchema);
 
-app.get("/", (req,res) =>{
+app.get("/articles", (req,res) =>{
 
-    const newArticle = new Article({
-        title : "REST",
-        content : "REST defintion"
-    })
-
-    // newArticle.save().then(() =>{
-    //     console.log("inserted");
-    // }).catch((err) =>{
-    //         console.log(err);
-    //     });
-
-    Article.find({}).then((docs)=>{
-        console.log(docs);
-    }).catch((err) =>{
+    Article.find({}).then((results) => {
+        // console.log(res);
+        res.send(results);
+    }).catch((err) => {
         console.log(err);
     })
+
+})
+
+app.post("/articles", (req,res) =>{
+
+    
+
 })
 
 let port = process.env.PORT;
