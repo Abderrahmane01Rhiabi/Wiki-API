@@ -58,6 +58,18 @@ app.post("/articles", (req,res) =>{
 
 })
 
+app.delete("/articles",(req,res) => {
+
+    Article.deleteMany({}).then((result) => {
+        console.log(result);
+        res.send("deleted successfullty " + result);
+
+    }).catch((err) => {
+        console.log(err);
+    })
+
+})
+
 let port = process.env.PORT;
 
 if(port == null || port == "") port = 3000;
