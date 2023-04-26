@@ -32,9 +32,9 @@ app.route("/articles")
 
     .get((req, res) => {
 
-        Article.find({}).then((results) => {
+        Article.find({}).then((reply) => {
             console.log(res);
-            res.send(results);
+            res.send(reply);
         }).catch((err) => {
             console.log(err);
         })
@@ -51,9 +51,9 @@ app.route("/articles")
         console.log(req.body.title);
         console.log(req.body.content);
 
-        newArticle.save().then((result) => {
-            console.log(result);
-            res.send("added successfullty " + result);
+        newArticle.save().then((reply) => {
+            console.log(reply);
+            res.send(reply);
         }).catch((err) => {
             console.log(err);
         })
@@ -62,9 +62,9 @@ app.route("/articles")
 
     .delete((req, res) => {
 
-        Article.deleteMany({}).then((result) => {
-            console.log(result);
-            res.send("deleted successfullty " + result);
+        Article.deleteMany({}).then((reply) => {
+            console.log(reply);
+            res.send("deleted successfullty " + reply);
         }).catch((err) => {
             console.log(err);
         })
@@ -76,42 +76,76 @@ app.route("/articles/:articleTitle")
 
 
     .get((req, res) => {
-        
+
         console.log(req.params.articleTitle);
-        let articleTitle = req.params.articleTitle.replace(/-/g," ");
+        let articleTitle = req.params.articleTitle.replace(/-/g, " ");
         console.log(articleTitle);
 
-        Article.findOne({ 
-            title : new RegExp(`^${articleTitle}$`, 'i') 
+        Article.findOne({
+            title: new RegExp(`^${articleTitle}$`, 'i')
         })
-        .then((result) => {
-            console.log(result);
-            res.send(result);
-        })
-        .catch((err) => {
-            console.log(err);
-        })
+            .then((reply) => {
+                console.log(reply);
+                res.send(reply);
+            })
+            .catch((err) => {
+                console.log(err);
+            })
 
 
     })
     .put((req, res) => {
         console.log(req.params.articleTitle);
-        let articleTitle = req.params.articleTitle.replace(/-/g," ");
+        let articleTitle = req.params.articleTitle.replace(/-/g, " ");
         console.log(articleTitle);
 
         Article
-        .updateOne({ title : new RegExp(`^${articleTitle}$`, 'i') }, { title: req.body.title, content: req.body.content })
-        .then((result) => {
-            console.log(result);
-            res.send(result);
-        })
-        .catch((err) => {
-            console.log(err);
-        });
+            .updateOne(
+                { title: new RegExp(`^${articleTitle}$`, 'i') },
+                { title: req.body.title, content: req.body.content }, // { $set: req.body },
+                { overwrite: false } /* specifies the overwrite option as true, which tells MongoDB to replace the existing document with the new document instead of merging the changes. */
+                //The overwrite option is not supported by the updateOne() method. Instead, you can use the updateOne() method with the upsert option set to true, which tells MongoDB to create a new document if no document matches the query.
+                )
+            .then((reply) => {
+                console.log(reply);
+                res.send(reply);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
 
+    }) //promise chain.
+    .patch((req, res) => {
+
+        console.log(req.params.articleTitle);
+        let articleTitle = req.params.articleTitle.replace(/-/g, " ");
+        console.log(articleTitle);
+
+        Article
+            .updateOne(
+                { title: new RegExp(`^${articleTitle}$`, 'i') },
+                { $set: req.body }
+            )
+            .then((reply) => {
+                console.log(reply);
+                res.send(reply);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     })
     .delete((req, res) => {
-
+        Article
+            .deleteOne({ 
+                title: new RegExp(`^${req.params.articleTitle}$`, 'i') 
+            })
+            .then((reply) => {
+                console.log(reply);
+                res.send(reply);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     });
 
 
